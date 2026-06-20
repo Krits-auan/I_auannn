@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>เค้ามีอะไรจะบอกอ้วน...</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #FFE9F0;
+    --bg-card: #FFFFFF;
+    --pink-deep: #D4537E;
+    --pink-darker: #993556;
+    --pink-darkest: #4B1528;
+    --ink: #4A2A36;
+    --ink-soft: #8A6373;
+    --shadow: 0 8px 24px rgba(212,83,126,0.18);
+  }
+
+  *{ box-sizing: border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background: var(--bg);
+    font-family:'Noto Sans Thai', sans-serif;
+    color: var(--ink);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding: 24px 16px;
+    overflow-x:hidden;
+  }
+
+  .display{ font-family:'Baloo 2', sans-serif; }
+
+  .stage{
+    width:100%;
+    max-width: 420px;
+    position:relative;
+  }
+
+  .progress{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-bottom: 22px;
+  }
+  .dot{
+    width:10px; height:10px;
+    border-radius:50%;
+    background: rgba(212,83,126,0.22);
+    transition: background 0.3s, transform 0.3s;
+  }
+  .dot.active{ background: var(--pink-deep); transform: scale(1.3); }
+  .dot.done{ background: var(--pink-deep); }
+
+  .card{
+    background: var(--bg-card);
+    border-radius: 28px;
+    padding: 32px 24px;
+    box-shadow: var(--shadow);
+    text-align:center;
+    position:relative;
+    min-height: 340px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+  }
+
+  .eyebrow{
+    font-size:13px;
+    color: var(--ink-soft);
+    margin: 0 0 6px;
+    letter-spacing: 0.3px;
+  }
+
+  h1.title{
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0 0 18px;
+    color: var(--pink-darker);
+    line-height:1.4;
+  }
+
+  p.desc{
+    font-size: 14px;
+    color: var(--ink-soft);
+    margin: 0 0 22px;
+    line-height:1.6;
+  }
+
+  /* intro screen */
+  .intro-text{
+    font-size: 22px;
+    font-weight:700;
+    color: var(--pink-darker);
+    line-height:1.6;
+    margin: 0 0 28px;
+  }
+
+  /* heart tap stage */
+  .heart-zone{
+    width:150px; height:150px;
+    border-radius:50%;
+    background: #FBEAF0;
+    display:flex; align-items:center; justify-content:center;
+    margin: 0 auto 20px;
+    cursor:pointer;
+    user-select:none;
+    border:none;
+    transition: transform 0.12s;
+  }
+  .heart-zone:active{ transform: scale(0.94); }
+  .heart-zone svg{ width:64px; height:64px; transition: transform 0.15s; }
+
+  .bar-track{
+    width:100%; max-width:220px;
+    height:10px;
+    background: #FBEAF0;
+    border-radius:999px;
+    overflow:hidden;
+    margin: 0 auto 8px;
+  }
+  .bar-fill{
+    height:100%; width:0%;
+    background: linear-gradient(90deg, var(--pink-deep), #F0997B);
+    border-radius:999px;
+    transition: width 0.25s;
+  }
+  .count-label{ font-size:12px; color: var(--ink-soft); margin:0 0 18px; }
+
+  .btn{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:600;
+    font-size:16px;
+    border:none;
+    border-radius:18px;
+    padding:14px 28px;
+    cursor:pointer;
+    background: var(--pink-deep);
+    color:white;
+    transition: transform 0.1s, opacity 0.2s, background 0.2s;
+    width:100%;
+    max-width: 320px;
+  }
+  .btn:active{ transform: scale(0.96); }
+  .btn:disabled{ opacity:0.5; cursor:default; }
+  .btn-stack{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    width:100%;
+    align-items:center;
+  }
+  .btn-small{
+    font-family:'Baloo 2', sans-serif;
+    font-weight:600;
+    font-size:13px;
+    border:none;
+    background:transparent;
+    color: var(--ink-soft);
+    text-decoration:underline;
+    cursor:pointer;
+    padding:6px;
+  }
+
+  .quiz-msg{
+    font-size: 19px;
+    font-weight:700;
+    color: var(--pink-darker);
+    line-height:1.6;
+    margin: 0 0 24px;
+  }
+
+  .final-msg{
+    font-size: 17px;
+    font-weight:600;
+    color: var(--pink-darkest);
+    line-height:1.8;
+    margin: 0;
+  }
+
+  .shake{ animation: shake 0.35s; }
+  @keyframes shake{
+    0%,100%{ transform: translateX(0); }
+    25%{ transform: translateX(-8px); }
+    75%{ transform: translateX(8px); }
+  }
+
+  /* reveal stage */
+  .reveal-card{
+    background: linear-gradient(160deg, #FBEAF0, #FFE9F0);
+    border-radius: 28px;
+    padding: 44px 24px;
+    text-align:center;
+    width:100%;
+  }
+  .reveal-icon{ font-size:13px; color: var(--pink-darker); margin: 0 0 10px; }
+  h1.reveal-text{
+    font-size: 36px;
+    font-weight: 800;
+    color: var(--pink-darkest);
+    margin: 0;
+    letter-spacing: 0.5px;
+    opacity:0;
+    transform: scale(0.7);
+  }
+  h1.reveal-text.pop{ animation: pop 0.45s cubic-bezier(.26,1.4,.44,1) forwards; }
+  @keyframes pop{
+    0%{ opacity:0; transform: scale(0.6); }
+    60%{ opacity:1; transform: scale(1.12); }
+    100%{ opacity:1; transform: scale(1); }
+  }
+  .reveal-sub{ font-size:13px; color: var(--ink-soft); margin-top: 18px; }
+
+  .screen{ display:none; }
+  .screen.show{ display:block; animation: fadein 0.35s; }
+  @keyframes fadein{
+    from{ opacity:0; transform: translateY(8px); }
+    to{ opacity:1; transform: translateY(0); }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <div class="progress" aria-hidden="true">
+    <div class="dot" id="dot1"></div>
+    <div class="dot" id="dot2"></div>
+    <div class="dot" id="dot3"></div>
+  </div>
+
+  <!-- INTRO -->
+  <div class="screen show" id="screenIntro">
+    <div class="card">
+      <p class="intro-text display">เค้ามีอะไรจะบอกอ้วนด้วยยย แต่ว่า...</p>
+      <p class="desc">ต้องผ่านด่านนี้ก่อนนะ</p>
+      <button class="btn" id="startBtn">เริ่มเลย</button>
+    </div>
+  </div>
+
+  <!-- STAGE 1: heart tap -->
+  <div class="screen" id="screen1">
+    <div class="card">
+      <p class="eyebrow">ด่าน 1 / 2</p>
+      <h1 class="title display">เก็บใจให้ครบก่อนนะ</h1>
+      <p class="desc">กดหัวใจ <strong id="needCount">15</strong> ครั้ง ถึงจะปลดล็อกด่านต่อไป</p>
+
+      <button class="heart-zone" id="heartBtn" aria-label="กดหัวใจ">
+        <svg viewBox="0 0 24 24" fill="#D4537E"><path d="M12 21s-7.5-4.6-10-9.3C0.3 8 1.6 4.5 5 3.5c2.2-0.6 4.1 0.5 5 2 0.9-1.5 2.8-2.6 5-2 3.4 1 4.7 4.5 3 8.2C19.5 16.4 12 21 12 21z"/></svg>
+      </button>
+
+      <div class="bar-track"><div class="bar-fill" id="bar1"></div></div>
+      <p class="count-label"><span id="tapCount">0</span> / <span id="needCount2">15</span></p>
+    </div>
+  </div>
+
+  <!-- STAGE 2: branching quiz -->
+  <div class="screen" id="screen2">
+    <div class="card">
+      <p class="eyebrow" id="quizEyebrow">ด่าน 2 / 2</p>
+      <p class="quiz-msg display" id="quizMsg">อ้วนรักเค้ามั้ย</p>
+      <div class="btn-stack" id="quizOptions"></div>
+      <p class="hint" id="retryHint" style="display:none; font-size:12px; color:var(--ink-soft); margin-top:14px;">ถ้าไม่พอใจให้ตอบใหม่</p>
+    </div>
+  </div>
+
+  <!-- STAGE 3: reveal -->
+  <div class="screen" id="screen3">
+    <div class="reveal-card">
+      <p class="reveal-icon display" id="revealLabel">ความลับที่ซ่อนไว้คือ...</p>
+      <h1 class="reveal-text display" id="revealText">เค้ารักอ้วน</h1>
+      <p class="reveal-sub" id="revealSub">จากใจเค้า ถึงอ้วน 🫶</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ---------- tiny click sound, no external audio files ---------- */
+let audioCtx = null;
+function playClick(freq = 720, dur = 0.06){
+  try{
+    if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = freq;
+    gain.gain.value = 0.06;
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
+    osc.start();
+    osc.stop(audioCtx.currentTime + dur);
+  }catch(e){ /* audio not supported, fail silently */ }
+}
+function playSuccess(){
+  playClick(660, 0.08);
+  setTimeout(() => playClick(880, 0.12), 90);
+}
+function playWrong(){
+  playClick(260, 0.14);
+}
+
+/* ---------- progress dots ---------- */
+function setStageDots(stage){
+  const dots = [document.getElementById('dot1'), document.getElementById('dot2'), document.getElementById('dot3')];
+  dots.forEach((d, i) => {
+    d.classList.remove('active', 'done');
+    if(i + 1 < stage) d.classList.add('done');
+    else if(i + 1 === stage) d.classList.add('active');
+  });
+}
+
+function goToScreen(id){
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('show'));
+  document.getElementById(id).classList.add('show');
+}
+
+/* ---------- INTRO ---------- */
+document.getElementById('startBtn').addEventListener('click', () => {
+  playClick(700, 0.06);
+  setStageDots(1);
+  goToScreen('screen1');
+});
+
+/* ---------- STAGE 1: heart tap ---------- */
+const NEED = 15;
+let taps = 0;
+const heartBtn = document.getElementById('heartBtn');
+const bar1 = document.getElementById('bar1');
+const tapCount = document.getElementById('tapCount');
+const heartSvg = heartBtn.querySelector('svg');
+
+document.getElementById('needCount').textContent = NEED;
+document.getElementById('needCount2').textContent = NEED;
+
+function resetStage1(){
+  taps = 0;
+  bar1.style.width = '0%';
+  tapCount.textContent = '0';
+  heartBtn.disabled = false;
+}
+
+heartBtn.addEventListener('click', () => {
+  if(taps >= NEED) return;
+  taps++;
+  playClick(700 + Math.random() * 80, 0.05);
+  const pct = Math.round((taps / NEED) * 100);
+  bar1.style.width = pct + '%';
+  tapCount.textContent = taps;
+
+  heartSvg.style.transform = 'scale(1.35)';
+  setTimeout(() => { heartSvg.style.transform = 'scale(1)'; }, 130);
+
+  if(taps >= NEED){
+    heartBtn.disabled = true;
+    playSuccess();
+    setTimeout(() => {
+      setStageDots(2);
+      goToScreen('screen2');
+      renderQuizStep('q1');
+    }, 500);
+  }
+});
+
+/* ---------- STAGE 2: branching quiz ---------- */
+const quizMsg = document.getElementById('quizMsg');
+const quizOptions = document.getElementById('quizOptions');
+const retryHint = document.getElementById('retryHint');
+const quizEyebrow = document.getElementById('quizEyebrow');
+
+function makeOptionBtn(label, onClick){
+  const btn = document.createElement('button');
+  btn.className = 'btn';
+  btn.textContent = label;
+  btn.addEventListener('click', () => {
+    playClick(620, 0.05);
+    onClick();
+  });
+  return btn;
+}
+
+function clearOptions(){
+  quizOptions.innerHTML = '';
+  retryHint.style.display = 'none';
+}
+
+function renderQuizStep(step){
+  clearOptions();
+  quizEyebrow.style.display = 'block';
+  quizEyebrow.textContent = 'ด่าน 2 / 2';
+
+  if(step === 'q1'){
+    quizMsg.textContent = 'อ้วนรักเค้ามั้ย';
+    quizOptions.appendChild(makeOptionBtn('ไม่รัก😡', () => renderQuizStep('q1-retry1')));
+    quizOptions.appendChild(makeOptionBtn('รัก', () => renderQuizStep('q2')));
+    quizOptions.appendChild(makeOptionBtn('รักมากกกกกก', () => goToFinal()));
+  }
+  else if(step === 'q1-retry1'){
+    quizMsg.textContent = 'จริงหรอ...🥺 ตอบใหม่เลย';
+    quizOptions.appendChild(makeOptionBtn('ไม่รัก😡', () => renderQuizStep('q1-retry2')));
+    quizOptions.appendChild(makeOptionBtn('รัก', () => renderQuizStep('q2')));
+    quizOptions.appendChild(makeOptionBtn('รักมากกกกกก', () => goToFinal()));
+  }
+  else if(step === 'q1-retry2'){
+    quizMsg.textContent = 'ตอบมา😠';
+    quizOptions.appendChild(makeOptionBtn('รัก', () => renderQuizStep('q2')));
+    quizOptions.appendChild(makeOptionBtn('รักมากกกกกก', () => goToFinal()));
+  }
+  else if(step === 'q2'){
+    quizMsg.textContent = 'รักแค่ไหน';
+    quizOptions.appendChild(makeOptionBtn('ล้อเล่น ไม่รักหรอก😝', () => renderQuizStep('q2-mad')));
+    quizOptions.appendChild(makeOptionBtn('รักมาก', () => renderQuizStep('q2-more')));
+    quizOptions.appendChild(makeOptionBtn('รักมากกว่าเค้า', () => goToFinal()));
+  }
+  else if(step === 'q2-mad'){
+    quizEyebrow.style.display = 'none';
+    quizMsg.textContent = 'งอนแล้ว!! กลับไปเล่นใหม่เลย😡';
+    quizOptions.appendChild(makeOptionBtn('เริ่มใหม่', () => {
+      resetStage1();
+      setStageDots(1);
+      goToScreen('screen1');
+    }));
+  }
+  else if(step === 'q2-more'){
+    quizMsg.textContent = 'งั้นเค้ารักมากกว่า🥰';
+    retryHint.style.display = 'block';
+    const retryBtn = makeOptionBtn('ตอบใหม่', () => renderQuizStep('q2'));
+    quizOptions.appendChild(retryBtn);
+  }
+}
+
+function goToFinal(){
+  playSuccess();
+  setTimeout(() => {
+    setStageDots(3);
+    document.getElementById('revealLabel').textContent = '';
+    document.getElementById('revealText').textContent = '';
+    document.getElementById('revealSub').textContent = '';
+
+    const card = document.querySelector('#screen3 .reveal-card');
+    card.innerHTML = '<p class="final-msg display">จริงหรอ🥹... ขอบคุณนะอ้วน ตั้งแต่มีอ้วนมาเค้ามีความสุขที่สุดเลย อ้วนอย่าทิ้งเค้าไปไหนน้าาา เค้าร้กอ้วนนนนน</p>';
+
+    goToScreen('screen3');
+  }, 350);
+}
+</script>
+
+</body>
+</html>
